@@ -10,10 +10,10 @@ import java.time.format.DateTimeFormatter;
 public class HitMapper {
 
 
-    public static BackHitDto toBackHitDto(Hit Hit) {
+    public static BackHitDto toBackHitDto(Hit hit) {
         return new BackHitDto(
-                Hit.getApp(),
-                Hit.getUri(),
+                hit.getApp(),
+                hit.getUri(),
                 0L
         );
     }
