@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface StatsRepository extends JpaRepository<Hit, Long> {
-   // List<Hit> findByAppAndUri(String app, String uri);
+    // List<Hit> findByAppAndUri(String app, String uri);
 
     List<Hit> findByUriAndTimestampsIsAfterAndTimestampsIsBefore(String uri, LocalDateTime startTime, LocalDateTime endTime);
 

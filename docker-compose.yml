@@ -20,7 +20,7 @@ services:
       dockerfile: ./statistics/stats-server/Dockerfile.postgres
     volumes:
         - /var/lib/postgresql/data/
-    container_name: explore-db
+    container_name: explore-stats-db
     ports:
         - "6541:5432"
     environment:
@@ -30,33 +30,38 @@ services:
         POSTGRES_PASSWORD: test
 
 #  ewm-service:
-#    image: postgres:14-alpine
-#    build:
-#      main-service
 #    ports:
 #      - "8080:8080"
-#    depends_on:
-#      - ewm-db
-#      - stats-server
-#    environment:
-#      #      TZ: Europe/Moscow
-#      URL_DB_MAIN: ewm-db:5433/explore-with-me-main
-#      USERNAME_DB_MAIN: test
-#      PASSWORD_DB_MAIN: test
-#      STATS_SERVER_URL: http://stats-server:9090
+#
 #  ewm-db:
 #    image: postgres:14-alpine
-#    build:
-#    context: ./main-service/
-#    dockerfile: ./main-service/Dockerfile.postgres
-#    volumes:
-#      - /var/lib/postgresql/data/
-#
-#    container_name: explore-with-me-main-db
-#    ports:
-#      - "6543:5433"
-#    environment:
-#      #      TZ: Europe/Moscow
-#      POSTGRES_DB: explore-with-me-main
-#      POSTGRES_USER: test
-#      POSTGRES_PASSWORD: test
+  ewm-service:
+    build:
+      main-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ewm-db
+#      - stats-server
+    environment:
+      #      TZ: Europe/Moscow
+      URL_DB_MAIN: ewm-db:5433/explore-with-me-main
+      USERNAME_DB_MAIN: test
+      PASSWORD_DB_MAIN: test
+#      STATS_SERVER_URL: http://stats-server:9090
+  ewm-db:
+    image: postgres:14-alpine
+    build:
+      context: ./main-service/
+      dockerfile: ./main-service/Dockerfile.postgres
+    volumes:
+      - /var/lib/postgresql/data/
+
+    container_name: explore-main-db
+    ports:
+      - "6543:5433"
+    environment:
+      #      TZ: Europe/Moscow
+      POSTGRES_DB: explore-with-me-main
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test

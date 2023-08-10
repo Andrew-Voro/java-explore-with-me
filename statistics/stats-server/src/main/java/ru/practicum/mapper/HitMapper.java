@@ -18,7 +18,6 @@ public class HitMapper {
         );
     }
 
-
     public static Hit toDtoHit(HitDto hitDto) {
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -27,7 +26,7 @@ public class HitMapper {
         hit.setApp(hitDto.getApp());
         hit.setUri(hitDto.getUri());
         hit.setIp(hitDto.getIp());
-        hit.setTimestamps(LocalDateTime.parse(hitDto.getTimestamp(),formatter));
+        hit.setTimestamps(LocalDateTime.parse(hitDto.getTimestamp(), formatter));
         return hit;
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.HitDto;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping
@@ -27,8 +26,8 @@ public class StatsClientController {
     @GetMapping("/stats")
     public ResponseEntity<Object> getStats(@RequestParam(name = "start") String start,
                                            @RequestParam(name = "end") String end,
-                                           @RequestParam(name = "uris",required = false) List<String> uris,
-                                           @RequestParam(name = "unique",required = false, defaultValue = "false")Boolean unique) throws Exception{
+                                           @RequestParam(name = "uris", required = false) List<String> uris,
+                                           @RequestParam(name = "unique", required = false, defaultValue = "false") Boolean unique) throws Exception {
 
         return statsClient.getStats(start, end, uris, unique);
     }
