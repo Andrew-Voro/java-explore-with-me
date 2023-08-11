@@ -20,7 +20,7 @@ public class StatsClient extends BaseClient {
     private static final String API_PREFIX = "";
 
     @Autowired
-    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(@Value("http://localhost:9090") String serverUrl, RestTemplateBuilder builder) { //${stats-server.url}
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
