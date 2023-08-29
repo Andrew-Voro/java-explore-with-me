@@ -32,11 +32,9 @@ public class PublicController {
     private final CompilationService compilationService;
 
     @GetMapping("/categories")
-    public ResponseEntity<List<CategoryDto>> getAllCategory(  ///
-                                                              @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
-                                                              @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
+    public ResponseEntity<List<CategoryDto>> getAllCategory(@Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
+                                                            @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
         log.info("Категории запрошены.");
-
         return new ResponseEntity<>(categoryService.getAllCategory(from, size), HttpStatus.OK);
     }
 
@@ -44,10 +42,8 @@ public class PublicController {
     public ResponseEntity<CategoryDto> getAllCategory(@PathVariable("catId") Long catId) {     ///                                                    )
         {
             log.info("Категория с  catId: " + catId + " запрошена.");
-
             return new ResponseEntity<>(categoryService.getCategory(catId), HttpStatus.OK);
         }
-
     }
 
 
@@ -77,7 +73,6 @@ public class PublicController {
             eventDynamicQueryDto = EventDynamicQueryDto.builder().text(text).sort(sort)
                     .onlyAvailable(onlyAvailable).categories(categories).paid(paid).build();
         }
-
         return new ResponseEntity<>(eventService.getEvent(eventDynamicQueryDto, from, size), HttpStatus.OK);
     }
 

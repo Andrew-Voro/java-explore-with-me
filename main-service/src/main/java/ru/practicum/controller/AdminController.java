@@ -120,9 +120,7 @@ public class AdminController {
     }
 
     @PatchMapping("/events/{eventId}")
-    public ResponseEntity<FullEventDto> updateEvent(@Min(0) @PathVariable("eventId") Long eventId, @RequestBody EventDto eventDto) {///
-
-
+    public ResponseEntity<FullEventDto> updateEvent(@Min(0) @PathVariable("eventId") Long eventId, @RequestBody EventDto eventDto) {
         if (eventDto.getDescription() != null && (eventDto.getDescription().length() < 20 || eventDto.getDescription().length() > 7000)) {
             log.info("Description события  должно содержать больше или равно 20 символов или меньше либо равно 7000");
             EventMapper.toDtoEvent(0L, eventDto, CategoryMapper.toDtoCategory(categoryService.getCategory(eventDto.getCategory())));
@@ -135,7 +133,6 @@ public class AdminController {
             return new ResponseEntity<>(EventMapper.toFullEventDto(EventMapper.toDtoEvent(0L, eventDto, CategoryMapper
                     .toDtoCategory(categoryService.getCategory(eventDto.getCategory())))), HttpStatus.BAD_REQUEST);
         }
-
         if (eventDto.getTitle() != null && (eventDto.getTitle().length() < 3 || eventDto.getTitle().length() > 120)) {
             log.info("Title события  должно содержать больше или равно 3 символов или меньше либо равно 120");
             EventMapper.toDtoEvent(0L, eventDto, CategoryMapper.toDtoCategory(categoryService.getCategory(eventDto.getCategory())));
@@ -153,7 +150,6 @@ public class AdminController {
             return new ResponseEntity<>(category, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(categoryService.saveCategory(category), HttpStatus.CREATED);
-
     }
 
     @PatchMapping("/categories/{catId}")
@@ -162,12 +158,10 @@ public class AdminController {
             log.info("Имя пользователя должно содержать больше или равно 2 символов или меньше либо равно 250");
             return new ResponseEntity<>(category, HttpStatus.BAD_REQUEST);
         }
-
         categoryService.getCategory(catId);
         log.info("Категория с  catId: " + catId + " обновлена.");
         return new ResponseEntity<>(categoryService.updateCategory(category, catId), HttpStatus.OK);
     }
-
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
@@ -197,7 +191,6 @@ public class AdminController {
     public ResponseEntity<Compilation> saveNewCompilation(@RequestBody @Valid CompilationDto compilation) {///
         if (compilation.getTitle().length() > 50) {
             log.info("Title сборки  должно содержать меньше или равно 50 символов ");
-
             return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? eventRepository
                     .findAllById(compilation.getEvents()) : null), HttpStatus.BAD_REQUEST);
         }
@@ -211,7 +204,7 @@ public class AdminController {
     }
 
     @PatchMapping("/compilations/{compId}")
-    public ResponseEntity<Compilation> patchCompilationById(@PathVariable(name = "compId") Long compId, @RequestBody CompilationDto compilation) {///
+    public ResponseEntity<Compilation> patchCompilationById(@PathVariable(name = "compId") Long compId, @RequestBody CompilationDto compilation) {
         if (compilation.getTitle() != null && compilation.getTitle().length() > 50) {
             log.info("Title сборки  должно содержать меньше или равно 50 символов ");
             return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? eventRepository

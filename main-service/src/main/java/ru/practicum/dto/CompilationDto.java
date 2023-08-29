@@ -13,7 +13,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class CompilationDto {
-    Long Id;
+    Long id;
     @NotNull
     @NotBlank
     String title;

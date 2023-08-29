@@ -10,12 +10,12 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CompilationMapper {
-    public static Compilation toDtoCompilation(CompilationDto CompilationDto, List<Event> events) {
+    public static Compilation toDtoCompilation(CompilationDto compilationDto, List<Event> events) {
         return new Compilation(
-                CompilationDto.getId(),
-                CompilationDto.getTitle(),
+                compilationDto.getId(),
+                compilationDto.getTitle(),
                 events,
-                CompilationDto.getPinned()
+                compilationDto.getPinned()
         );
     }
 }

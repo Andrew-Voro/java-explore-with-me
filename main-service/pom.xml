@@ -21,8 +21,6 @@
             <groupId>ru.practicum</groupId>
             <artifactId>client</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <!--<scope>system</scope>
-            <systemPath>${basedir}/../statistics/client/target/client-0.0.1-SNAPSHOT.jar</systemPath>-->
         </dependency>
 
         <dependency>
@@ -73,13 +71,7 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>ru.practicum</groupId>
-            <artifactId>client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
+      
     </dependencies>
 
 

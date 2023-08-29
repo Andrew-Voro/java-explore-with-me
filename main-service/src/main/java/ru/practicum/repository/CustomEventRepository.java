@@ -28,10 +28,6 @@ public class CustomEventRepository {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        ///events?text=0&categories=0&paid=true&rangeStart=2022-01-06%2013%3A30%3A38&rangeEnd=2097-09-06%2013%3A30%3A38
-// &onlyAvailable=false&sort=EVENT_DATE&from=0&size=1000
-
-
         if (eventDynamicQueryDto.getUsers().isPresent()) {
             Predicate initiators = root.get("initiator").in(eventDynamicQueryDto.getUsers().get());
             predicates.add(initiators);
@@ -58,10 +54,6 @@ public class CustomEventRepository {
         criteriaQuery.select(root)
                 .where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
         TypedQuery<Event> query = entityManager.createQuery(criteriaQuery);
-        //long totalRows = query.getResultList().size();
-        //Page<Event> result = new PageImpl<>(query.getResultList(), page, totalRows);
-
-        //return result;
         query.setFirstResult(0);
         query.setMaxResults(10);
         List<Event> result = query.getResultList();
@@ -76,16 +68,12 @@ public class CustomEventRepository {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        ///events?text=0&categories=0&paid=true&rangeStart=2022-01-06%2013%3A30%3A38&rangeEnd=2097-09-06%2013%3A30%3A38
-// &onlyAvailable=false&sort=EVENT_DATE&from=0&size=1000
-
         if (eventDynamicQueryDto.getText().isPresent()) {
             String searchText = "%" + eventDynamicQueryDto.getText().get().toLowerCase() + "%";
             Predicate searchAnnotation = builder.like(root.get("annotation"), searchText);
             Predicate searchDescription = builder.like(root.get("description"), searchText);
             predicates.add(builder.or(searchAnnotation, searchDescription));
         }
-
 
         if (eventDynamicQueryDto.getCategories().isPresent()) {
             Predicate categories = root.get("category").in(eventDynamicQueryDto.getCategories().get());
@@ -112,30 +100,21 @@ public class CustomEventRepository {
                 criteriaQuery.select(root)
                         .where(builder.or(predicates.toArray(new Predicate[predicates.size()]))).orderBy(builder.desc(root.get("eventDate")));
                 TypedQuery<Event> query = entityManager.createQuery(criteriaQuery);
-                //long totalRows = query.getResultList().size();
-                // Page<Event> result = new PageImpl<>(query.getResultList(), page, totalRows);
-                //return result;
                 query.setFirstResult(0);
                 query.setMaxResults(10);
                 List<Event> result = query.getResultList();
-
                 return result;
-            } else {
-
-            }
+            } /*else {
+            }*/
         } else {
             criteriaQuery.select(root)
                     .where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
-
         }
 
         TypedQuery<Event> query = entityManager.createQuery(criteriaQuery);
-        //long totalRows = query.getResultList().size();
-        //Page<Event> result = new PageImpl<>(query.getResultList(), page, totalRows);
         query.setFirstResult(0);
         query.setMaxResults(10);
         List<Event> result = query.getResultList();
-
         return result;
     }
 }
