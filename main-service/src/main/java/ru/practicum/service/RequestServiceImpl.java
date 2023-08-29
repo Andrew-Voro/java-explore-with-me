@@ -132,7 +132,9 @@ public class RequestServiceImpl implements RequestService {
                     .filter(o -> o.getStatus().equals(State.PENDING))
                     .collect(Collectors.toList());
             confirmedRequests.forEach(o -> o.setStatus(State.CONFIRMED));
-            requestRepository.saveAll(confirmedRequests.stream().map(x->RequestMapper.toDtoRequest(x,userRepository.findById(x.getRequester()).orElse(null),eventRepository.findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
+            requestRepository.saveAll(confirmedRequests.stream().map(x->RequestMapper
+                    .toDtoRequest(x,userRepository.findById(x.getRequester()).orElse(null),eventRepository
+                            .findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
             event.setConfirmedRequests(event.getConfirmedRequests() + confirmedRequests.size());
             eventRepository.save(event);
         }
@@ -143,7 +145,9 @@ public class RequestServiceImpl implements RequestService {
                     .filter(o -> o.getStatus().equals(State.PENDING))
                     .collect(Collectors.toList());
             rejectedRequests.forEach(o -> o.setStatus(State.REJECTED));
-            requestRepository.saveAll(rejectedRequests.stream().map(x->RequestMapper.toDtoRequest(x,userRepository.findById(x.getRequester()).orElse(null),eventRepository.findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
+            requestRepository.saveAll(rejectedRequests.stream().map(x->RequestMapper.toDtoRequest(x,userRepository
+                    .findById(x.getRequester()).orElse(null),eventRepository
+                    .findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
         }
 
         
