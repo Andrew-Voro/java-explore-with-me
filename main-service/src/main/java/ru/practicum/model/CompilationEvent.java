@@ -4,21 +4,18 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 
 @Entity
-@Table(name = "users", schema = "public", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
+@Table(name = "compilation_event", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class User {
+public class CompilationEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    String name;
-    @Email
-    @NonNull
-    String email;
+    Long event;
+    Long compilation;
 }

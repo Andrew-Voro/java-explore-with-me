@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.practicum.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.client.BaseClient;
 import ru.practicum.dto.HitDto;
 
 import java.net.URLEncoder;
@@ -29,11 +28,11 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    ResponseEntity<Object> saveHit(HitDto hit) {
+    public ResponseEntity<Object> saveHit(HitDto hit) {
         return post("/hit", hit);
     }
 
-    ResponseEntity<Object> getStats(String start, String end, List<String> uris, Boolean unique) throws Exception {
+    public ResponseEntity<Object> getStats(String start, String end, List<String> uris, Boolean unique) throws Exception {
         Map<String, Object> parameters = Map.of(
                 "start", URLEncoder.encode(start, StandardCharsets.UTF_8.toString()),
                 "end", URLEncoder.encode(end, StandardCharsets.UTF_8.toString()),

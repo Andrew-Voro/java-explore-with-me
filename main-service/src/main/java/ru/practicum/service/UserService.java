@@ -1,12 +1,11 @@
 package ru.practicum.service;
 
 import org.springframework.http.ResponseEntity;
-import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.UserDto;
 
 import java.util.List;
 
-public interface AdminService {
+public interface UserService {
 
     ResponseEntity<UserDto> updateUser(UserDto user, Long id);
 
@@ -21,9 +20,5 @@ public interface AdminService {
     UserDto getUser(Long id);
 
     void deleteUser(Long id);
-
-    CategoryDto saveCategory(CategoryDto category);
-
-    CategoryDto updateCategory(CategoryDto category, Long catId);
 
 }

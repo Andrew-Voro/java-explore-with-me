@@ -4,5 +4,10 @@ public enum State {
     PENDING,
     PUBLISHED,
     PUBLISH_EVENT,
-    CANCELED
+    CANCEL_REVIEW,
+    CANCELED,
+    CONFIRMED,
+    REJECTED,
+    REJECT_EVENT,
+    SEND_TO_REVIEW
 }

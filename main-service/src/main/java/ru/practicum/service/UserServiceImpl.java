@@ -6,14 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.UserDto;
+import ru.practicum.handler.exception.ConflictException;
 import ru.practicum.handler.exception.ObjectNotFoundException;
-import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.mapper.UserMapper;
-import ru.practicum.model.Category;
 import ru.practicum.model.User;
-import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -24,10 +21,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AdminServiceImpl implements AdminService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
+
 
     @Transactional
     public ResponseEntity<UserDto> updateUser(UserDto userDto, Long id) {
@@ -52,8 +49,13 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     @Override
     public UserDto saveUser(UserDto userDto) {
-        User user = userRepository.save(UserMapper.toDtoUser(userDto));
-        return UserMapper.toUserDto(user);
+        String name = userDto.getName();
+        if (userRepository.findByName(name).isEmpty()) {
+            User user = userRepository.save(UserMapper.toDtoUser(userDto));
+            return UserMapper.toUserDto(user);
+        } else {
+            throw new ConflictException("Пользователь с именем " + name + " уже существует.");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -92,23 +94,6 @@ public class AdminServiceImpl implements AdminService {
         userRepository.deleteById(id);
     }
 
-    @Transactional ///
-    @Override
-    public CategoryDto saveCategory(CategoryDto categoryDto) {
-        Category category = categoryRepository.save(CategoryMapper.toDtoCategory(categoryDto));
-        return CategoryMapper.toCategoryDto(category);
-    }
-
-    @Transactional ///
-    @Override
-    public CategoryDto updateCategory(CategoryDto categoryDto, Long catId) {
-        Category category = categoryRepository.findById(catId).orElseThrow(() -> new ObjectNotFoundException("Category not found"));
-
-        if (categoryDto.getName() != null) {
-            category.setName(categoryDto.getName());
-        }
-        return CategoryMapper.toCategoryDto(categoryRepository.save(category));
-    }
 
 }
 

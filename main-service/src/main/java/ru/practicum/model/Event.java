@@ -1,14 +1,16 @@
 package ru.practicum.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.enums.State;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "events", schema = "public")
+@Table(name = "events", schema = "public", uniqueConstraints = {@UniqueConstraint(columnNames = {"title"})})
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -43,4 +45,16 @@ public class Event {
     @Enumerated(EnumType.STRING)
     State stateAction;
     String title;
+    @JsonBackReference
+    //@ManyToMany(mappedBy = "events")
+    // @JsonManagedReference
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "compilation_event",
+            joinColumns = @JoinColumn(name = "compilation_id",
+                    referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id")
+    )
+
+    List<Compilation> compilations;
+    Long views;
 }

@@ -9,9 +9,13 @@ import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.FullEventDto;
 import ru.practicum.dto.query.EventDynamicQueryDto;
 import ru.practicum.enums.Sort;
+import ru.practicum.handler.exception.ValidationException;
+import ru.practicum.model.Compilation;
 import ru.practicum.service.CategoryService;
+import ru.practicum.service.CompilationService;
 import ru.practicum.service.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +29,7 @@ import java.util.Optional;
 public class PublicController {
     private final EventService eventService;
     private final CategoryService categoryService;
+    private final CompilationService compilationService;
 
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDto>> getAllCategory(  ///
@@ -45,8 +50,7 @@ public class PublicController {
 
     }
 
-    ///events?text=0&categories=0&paid=true&rangeStart=2022-01-06%2013%3A30%3A38&rangeEnd=2097-09-06%2013%3A30%3A38
-// &onlyAvailable=false&sort=EVENT_DATE&from=0&size=1000
+
     @GetMapping("/events")
     public ResponseEntity<List<FullEventDto>> getEventFiltered(@RequestParam(name = "text") Optional<String> text,  ///
                                                                @RequestParam(name = "categories") Optional<List<Long>> categories,
@@ -59,14 +63,41 @@ public class PublicController {
                                                                @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startTime = LocalDateTime.parse(rangeStart, formatter);
-        LocalDateTime endTime = LocalDateTime.parse(rangeEnd, formatter);
-
-
-        EventDynamicQueryDto eventDynamicQueryDto = EventDynamicQueryDto.builder().text(text).sort(sort)
-                .onlyAvailable(onlyAvailable).categories(categories).rangeStart(startTime).rangeEnd(endTime)
-                .paid(paid).build();
+        EventDynamicQueryDto eventDynamicQueryDto;
+        if (rangeStart != null && rangeEnd != null) {
+            LocalDateTime startTime = LocalDateTime.parse(rangeStart, formatter);
+            LocalDateTime endTime = LocalDateTime.parse(rangeEnd, formatter);
+            if (endTime.isBefore(startTime)) {
+                throw new ValidationException("rangeEnd не может быть раньше rangeStart");
+            }
+            eventDynamicQueryDto = EventDynamicQueryDto.builder().text(text).sort(sort)
+                    .onlyAvailable(onlyAvailable).categories(categories).rangeStart(startTime).rangeEnd(endTime)
+                    .paid(paid).build();
+        } else {
+            eventDynamicQueryDto = EventDynamicQueryDto.builder().text(text).sort(sort)
+                    .onlyAvailable(onlyAvailable).categories(categories).paid(paid).build();
+        }
 
         return new ResponseEntity<>(eventService.getEvent(eventDynamicQueryDto, from, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/events/{id}")
+    public ResponseEntity<FullEventDto> getEventById(@PathVariable(name = "id") Long id, HttpServletRequest request) throws Exception {
+        return new ResponseEntity<>(eventService.getEventById(id, request), HttpStatus.OK);
+    }
+
+    @GetMapping("/compilations/{compId}")
+    public ResponseEntity<Compilation> getCompilationById(@PathVariable(name = "compId") Long compId) {
+        return new ResponseEntity<>(compilationService.getCompilationById(compId), HttpStatus.OK);
+    }
+
+    @GetMapping("/compilations")
+    public ResponseEntity<List<Compilation>> getCompilations(@RequestParam(name = "pinned") Optional<Boolean> pinned,
+                                                             @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
+                                                             @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) throws Exception {
+        if (pinned.isEmpty()) {
+            return new ResponseEntity<>(compilationService.getCompilations(from, size), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(compilationService.getCompilations(pinned.get(), from, size), HttpStatus.OK);
     }
 }

@@ -20,24 +20,46 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StatsServiceImp implements StatsService {
     private final StatsRepository statsRepository;
+    private final DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Transactional
     @Override
     public BackHitDto saveHit(HitDto hit) {
-        // Long numberOfHits = (long) statsRepository.findByAppAndUri(hit.getApp(), hit.getUri()).size();
-        Hit saveHit = statsRepository.save(HitMapper.toDtoHit(hit));
-        BackHitDto backHitDto = HitMapper.toBackHitDto(saveHit);
+        //Long numberOfHits = (long) statsRepository.findByAppAndUri(hit.getApp(), hit.getUri()).size();
+        try {
+            String time = hit.getTimestamp();
+            String formattedTime = LocalDateTime.parse(time).format(formatter);
+            // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            // String format2 = localDateTime3.format(formatter);
+            hit.setTimestamp(formattedTime);
+            Hit saveHit = statsRepository.save(HitMapper.toDtoHit(hit));
+            BackHitDto backHitDto = HitMapper.toBackHitDto(saveHit);
+            return backHitDto;
+            // Hit saveHit = statsRepository.save(HitMapper.toDtoHit(hit));
+        } catch (Exception e) {
+            Hit saveHit = statsRepository.save(HitMapper.toDtoHit(hit));
+            BackHitDto backHitDto = HitMapper.toBackHitDto(saveHit);
+            return backHitDto;
+        }
+
+
         //backHitDto.setHits(numberOfHits);
-        return backHitDto;
+
     }
 
     @Transactional
     @Override
     public List<BackHitDto> getStats(String start, String end, List<String> uris, Boolean unique) {
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startTime = LocalDateTime.parse(start, formatter);
-        LocalDateTime endTime = LocalDateTime.parse(end, formatter);
+        LocalDateTime startTime;
+        LocalDateTime endTime;
+        try {
+            startTime = LocalDateTime.parse(start, formatter);
+            endTime = LocalDateTime.parse(end, formatter);
+        } catch (Exception e) {
+            startTime = LocalDateTime.parse(start);
+            endTime = LocalDateTime.parse(end);
+        }
         List<BackHitDto> stats = new ArrayList<>();
         if (uris != null && uris.get(0).equals("null")) {
             uris = null;

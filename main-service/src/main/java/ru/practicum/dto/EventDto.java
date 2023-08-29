@@ -24,8 +24,11 @@ public class EventDto {
     State stateAction;
     String eventDate;
     Location location;
+    @NotNull
+    @NotBlank
     String title;
     Boolean paid;
     Long participantLimit;
     Boolean requestModeration;
-    }
+    Long views;
+}
