@@ -113,9 +113,8 @@ public class RequestServiceImpl implements RequestService {
         if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
             throw new ConflictException("Лимит заявок на участие превышен");
         }
-        //List<User> requesters =  userRepository.findAllById(eventRequestConfirmQueryDto.getRequestIds());
-        //List<Request> requests = requestRepository.findByEventAndIdIn(event, eventRequestConfirmQueryDto.getRequestIds());
-        List<Request> requests = requestRepository.findByIdIn(eventRequestConfirmQueryDto.getRequestIds());
+        List<Request> requests = requestRepository.findByEventAndIdIn(event, eventRequestConfirmQueryDto.getRequestIds());
+       /* List<Request> requests = requestRepository.findByIdIn(eventRequestConfirmQueryDto.getRequestIds());
         List<RequestDto> requestsDtos =  requests.stream().map(RequestMapper::toRequestDto).collect(Collectors.toList());
 
         List<RequestDto> confirmedRequests = new ArrayList<>();
@@ -124,7 +123,6 @@ public class RequestServiceImpl implements RequestService {
         if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
             throw new ConflictException("Лимит заявок на участие превышен");
         }
-
         if (!event.getConfirmedRequests().equals(event.getParticipantLimit())
                 && (eventRequestConfirmQueryDto.getStatus().equals(State.CONFIRMED))) {
             confirmedRequests = requestsDtos
@@ -148,10 +146,8 @@ public class RequestServiceImpl implements RequestService {
             requestRepository.saveAll(rejectedRequests.stream().map(x->RequestMapper.toDtoRequest(x,userRepository
                     .findById(x.getRequester()).orElse(null),eventRepository
                     .findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
-        }
-
-        
-        /*Long participantLimit = event.getParticipantLimit();
+        }*/
+        Long participantLimit = event.getParticipantLimit();
         Long confirmedRequests = event.getConfirmedRequests();
         Boolean unConfirmed = false;
         for (Request request : requests) {
@@ -173,12 +169,12 @@ public class RequestServiceImpl implements RequestService {
         if (unConfirmed) {
             requestRepository.saveAll(requests);
             throw new ConflictException("Лимит заявок на участие превышен");
-        }*/
+        }
 
-       // List<Request> list = requestRepository.saveAll(requests);
-        //List<RequestDto> confirmed = list.stream().filter(x -> x.getStatus().equals(State.CONFIRMED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
-        //List<RequestDto> rejected = list.stream().filter(x -> x.getStatus().equals(State.REJECTED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
-        return RequestsDtoLists.builder().confirmedRequests(confirmedRequests).rejectedRequests(rejectedRequests).build();
+        List<Request> list = requestRepository.saveAll(requests);
+        List<RequestDto> confirmed = list.stream().filter(x -> x.getStatus().equals(State.CONFIRMED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
+        List<RequestDto> rejected = list.stream().filter(x -> x.getStatus().equals(State.REJECTED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
+        return RequestsDtoLists.builder().confirmedRequests(confirmed).rejectedRequests(rejected).build();
 
     }
 }
