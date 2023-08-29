@@ -17,6 +17,7 @@ import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.RequestRepository;
 import ru.practicum.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,7 +116,38 @@ public class RequestServiceImpl implements RequestService {
         //List<User> requesters =  userRepository.findAllById(eventRequestConfirmQueryDto.getRequestIds());
         //List<Request> requests = requestRepository.findByEventAndIdIn(event, eventRequestConfirmQueryDto.getRequestIds());
         List<Request> requests = requestRepository.findByIdIn(eventRequestConfirmQueryDto.getRequestIds());
-        Long participantLimit = event.getParticipantLimit();
+        List<RequestDto> requestsDtos =  requests.stream().map(RequestMapper::toRequestDto).collect(Collectors.toList());
+
+        List<RequestDto> confirmedRequests = new ArrayList<>();
+        List<RequestDto> rejectedRequests = new ArrayList<>();
+
+        if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
+            throw new ConflictException("Лимит заявок на участие превышен");
+        }
+
+        if (!event.getConfirmedRequests().equals(event.getParticipantLimit())
+                && (eventRequestConfirmQueryDto.getStatus().equals(State.CONFIRMED))) {
+            confirmedRequests = requestsDtos
+                    .stream()
+                    .filter(o -> o.getStatus().equals(State.PENDING))
+                    .collect(Collectors.toList());
+            confirmedRequests.forEach(o -> o.setStatus(State.CONFIRMED));
+            requestRepository.saveAll(confirmedRequests.stream().map(x->RequestMapper.toDtoRequest(x,userRepository.findById(x.getRequester()).orElse(null),eventRepository.findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
+            event.setConfirmedRequests(event.getConfirmedRequests() + confirmedRequests.size());
+            eventRepository.save(event);
+        }
+        if (event.getConfirmedRequests().equals(event.getParticipantLimit())
+                || eventRequestConfirmQueryDto.getStatus().equals(State.REJECTED)) {
+            rejectedRequests = requestsDtos
+                    .stream()
+                    .filter(o -> o.getStatus().equals(State.PENDING))
+                    .collect(Collectors.toList());
+            rejectedRequests.forEach(o -> o.setStatus(State.REJECTED));
+            requestRepository.saveAll(rejectedRequests.stream().map(x->RequestMapper.toDtoRequest(x,userRepository.findById(x.getRequester()).orElse(null),eventRepository.findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
+        }
+
+        
+        /*Long participantLimit = event.getParticipantLimit();
         Long confirmedRequests = event.getConfirmedRequests();
         Boolean unConfirmed = false;
         for (Request request : requests) {
@@ -137,12 +169,12 @@ public class RequestServiceImpl implements RequestService {
         if (unConfirmed) {
             requestRepository.saveAll(requests);
             throw new ConflictException("Лимит заявок на участие превышен");
-        }
+        }*/
 
-        List<Request> list = requestRepository.saveAll(requests);
-        List<RequestDto> confirmed = list.stream().filter(x -> x.getStatus().equals(State.CONFIRMED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
-        List<RequestDto> rejected = list.stream().filter(x -> x.getStatus().equals(State.REJECTED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
-        return RequestsDtoLists.builder().confirmedRequests(confirmed).rejectedRequests(rejected).build();
+       // List<Request> list = requestRepository.saveAll(requests);
+        //List<RequestDto> confirmed = list.stream().filter(x -> x.getStatus().equals(State.CONFIRMED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
+        //List<RequestDto> rejected = list.stream().filter(x -> x.getStatus().equals(State.REJECTED)).map(RequestMapper::toRequestDto).collect(Collectors.toList());
+        return RequestsDtoLists.builder().confirmedRequests(confirmedRequests).rejectedRequests(rejectedRequests).build();
 
     }
 }
