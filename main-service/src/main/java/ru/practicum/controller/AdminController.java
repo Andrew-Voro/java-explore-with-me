@@ -144,7 +144,7 @@ public class AdminController {
     }
 
     @PostMapping("/categories")
-    public ResponseEntity<CategoryDto> saveNewCategory(@RequestBody @Valid CategoryDto category) {///
+    public ResponseEntity<CategoryDto> saveNewCategory(@RequestBody @Valid CategoryDto category) {
         if (category.getName().length() > 50) {
             log.info("Имя пользователя должно содержать больше или равно 2 символов или меньше либо равно 250");
             return new ResponseEntity<>(category, HttpStatus.BAD_REQUEST);
@@ -153,7 +153,7 @@ public class AdminController {
     }
 
     @PatchMapping("/categories/{catId}")
-    public ResponseEntity<CategoryDto> updateCategory(@Min(0) @PathVariable("catId") Long catId, @RequestBody @Valid CategoryDto category) {///
+    public ResponseEntity<CategoryDto> updateCategory(@Min(0) @PathVariable("catId") Long catId, @RequestBody @Valid CategoryDto category) {
         if (category.getName().length() > 50) {
             log.info("Имя пользователя должно содержать больше или равно 2 символов или меньше либо равно 250");
             return new ResponseEntity<>(category, HttpStatus.BAD_REQUEST);
@@ -188,7 +188,7 @@ public class AdminController {
     }
 
     @PostMapping("/compilations")
-    public ResponseEntity<Compilation> saveNewCompilation(@RequestBody @Valid CompilationDto compilation) {///
+    public ResponseEntity<Compilation> saveNewCompilation(@RequestBody @Valid CompilationDto compilation) {
         if (compilation.getTitle().length() > 50) {
             log.info("Title сборки  должно содержать меньше или равно 50 символов ");
             return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? eventRepository

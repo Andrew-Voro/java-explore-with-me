@@ -39,11 +39,10 @@ public class PublicController {
     }
 
     @GetMapping("/categories/{catId}")
-    public ResponseEntity<CategoryDto> getAllCategory(@PathVariable("catId") Long catId) {     ///                                                    )
-        {
-            log.info("Категория с  catId: " + catId + " запрошена.");
-            return new ResponseEntity<>(categoryService.getCategory(catId), HttpStatus.OK);
-        }
+    public ResponseEntity<CategoryDto> getAllCategory(@PathVariable("catId") Long catId) {
+        log.info("Категория с  catId: " + catId + " запрошена.");
+        return new ResponseEntity<>(categoryService.getCategory(catId), HttpStatus.OK);
+
     }
 
 
