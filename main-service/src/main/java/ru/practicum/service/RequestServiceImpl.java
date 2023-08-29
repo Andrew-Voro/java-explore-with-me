@@ -45,13 +45,15 @@ public class RequestServiceImpl implements RequestService {
 
 
         if (requestRepository.findByEventAndRequester(event, user).isEmpty()) {
-            if (event.getParticipantLimit() == 0 || event.getRequestModeration().equals(false)) {
+
+
+            if (event.getParticipantLimit() <= requestRepository.findByEvent(event).size()) {
+                requestRepository.save(RequestMapper.toDtoRequest(requestDto, user, event));///////посмотреть
+                throw new ConflictException("Превышен лимит участников.");
+            } else if (event.getParticipantLimit() == 0 || event.getRequestModeration().equals(false)) {
                 requestDto.setStatus(State.CONFIRMED);
                 event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                 eventRepository.save(event);
-            } else if (event.getParticipantLimit() <= requestRepository.findByEvent(event).size()) {
-                requestRepository.save(RequestMapper.toDtoRequest(requestDto, user, event));///////посмотреть
-                throw new ConflictException("Превышен лимит участников.");
             } else if (event.getParticipantLimit() > event.getConfirmedRequests()) {
 
                 eventRepository.save(event);
@@ -108,8 +110,12 @@ public class RequestServiceImpl implements RequestService {
     public RequestsDtoLists updateRequestStatusByOwner(Long userId, Long eventId, EventRequestConfirmQueryDto eventRequestConfirmQueryDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("User not found"));
         Event event = eventRepository.findByIdAndInitiator(eventId, userId).orElseThrow(() -> new ObjectNotFoundException("Event not found"));
+        if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
+            throw new ConflictException("Лимит заявок на участие превышен");
+        }
         //List<User> requesters =  userRepository.findAllById(eventRequestConfirmQueryDto.getRequestIds());
-        List<Request> requests = requestRepository.findByEventAndIdIn(event, eventRequestConfirmQueryDto.getRequestIds());
+        //List<Request> requests = requestRepository.findByEventAndIdIn(event, eventRequestConfirmQueryDto.getRequestIds());
+        List<Request> requests = requestRepository.findByIdIn(eventRequestConfirmQueryDto.getRequestIds());
         Long participantLimit = event.getParticipantLimit();
         Long confirmedRequests = event.getConfirmedRequests();
         Boolean unConfirmed = false;
