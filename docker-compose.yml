@@ -3,6 +3,7 @@ services:
   stats-server:
     build:
       statistics/stats-server
+    container_name: stats-server2
     ports:
       - "9090:9090"
     depends_on:
@@ -51,6 +52,7 @@ services:
       URL_DB_MAIN: ewm-db:5432/explore-with-me-main
       USERNAME_DB_MAIN: test
       PASSWORD_DB_MAIN: test
+      STATS_URL: http://stats-server2:9090
   #      STATS_SERVER_URL: http://stats-server:9090
   ewm-db:
     image: postgres:14-alpine
