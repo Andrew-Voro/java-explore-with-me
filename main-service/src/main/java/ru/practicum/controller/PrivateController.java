@@ -106,13 +106,8 @@ public class PrivateController {
     @PostMapping("/{userId}/requests")
     public ResponseEntity<RequestDto> saveRequest(@Min(0) @PathVariable("userId") Long userId,
                                                   @Min(0) @RequestParam(name = "eventId") Long eventId) {
-
-        //LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(formatter),formatter);
-        // LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
-
         RequestDto requestDto = RequestDto.builder().created(LocalDateTime.now()).event(eventId).requester(userId).status(State.PENDING).build(); //State.CONFIRMED
         return new ResponseEntity<>(requestService.saveRequest(userId, eventId, requestDto), HttpStatus.CREATED);
-
     }
 
     @GetMapping("/{userId}/requests")

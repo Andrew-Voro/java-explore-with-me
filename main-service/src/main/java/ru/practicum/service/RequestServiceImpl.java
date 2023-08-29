@@ -43,11 +43,9 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Запрос на участие в  событии не возможен,превышен лимит участников.");
         }*/
 
-
         if (requestRepository.findByEventAndRequester(event, user).isEmpty()) {
 
-
-            if (event.getParticipantLimit() <= requestRepository.findByEvent(event).size()) {
+            if (event.getParticipantLimit() <= requestRepository.findByEvent(event).size() && event.getRequestModeration().equals(true)) {
                 requestRepository.save(RequestMapper.toDtoRequest(requestDto, user, event));///////посмотреть
                 throw new ConflictException("Превышен лимит участников.");
             } else if (event.getParticipantLimit() == 0 || event.getRequestModeration().equals(false)) {
