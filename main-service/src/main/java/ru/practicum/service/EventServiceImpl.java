@@ -175,15 +175,13 @@ public class EventServiceImpl implements EventService {
     @Transactional
     @Override
     public List<FullEventDto> getEvent(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size) {
-        PageRequest page = PageRequest.of(from.intValue() > 0 ? from.intValue() / size.intValue() : 0, size.intValue());
-        return customEventRepository.findEvent(eventDynamicQueryDto, page).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
+        return customEventRepository.findEvent(eventDynamicQueryDto, from, size).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
     }
 
     @Transactional
     @Override
     public List<FullEventDto> getEventByAdmin(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size) {
-        PageRequest page = PageRequest.of(from.intValue() > 0 ? from.intValue() / size.intValue() : 0, size.intValue());
-        return customEventRepository.findEventByAdmin(eventDynamicQueryDto, page).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
+        return customEventRepository.findEventByAdmin(eventDynamicQueryDto, from, size).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
     }
 
 
