@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.dto.query.EventDynamicQueryDto;
 import ru.practicum.enums.Sort;
-import ru.practicum.enums.State;
 import ru.practicum.model.Event;
 
 import javax.persistence.EntityManager;
@@ -71,7 +70,6 @@ public class CustomEventRepository {
             Predicate searchDescription = builder.like(root.get("description"), searchText);
             predicates.add(builder.or(searchAnnotation, searchDescription));
         }
-
         if (eventDynamicQueryDto.getCategories().isPresent()) {
             Predicate categories = root.get("category").in(eventDynamicQueryDto.getCategories().get());
             predicates.add(categories);
@@ -94,7 +92,6 @@ public class CustomEventRepository {
             predicates.add(builder.notEqual(builder.diff(confirmed, limit), 0));
 
         }
-
         /*//predicates.add(builder.equal(root.get("state_action"), State.PUBLISHED));
 
         criteriaQuery.where(predicates.toArray(new Predicate[0]));
@@ -114,13 +111,11 @@ public class CustomEventRepository {
                 query.setMaxResults(10);
                 List<Event> result = query.getResultList();
                 return result;
-            } else {
             }
         } else {
             criteriaQuery.select(root)
                     .where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
         }
-
         TypedQuery<Event> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(0);
         query.setMaxResults(10);
