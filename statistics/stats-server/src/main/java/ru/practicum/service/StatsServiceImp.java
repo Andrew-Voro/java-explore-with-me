@@ -43,9 +43,7 @@ public class StatsServiceImp implements StatsService {
             return backHitDto;
         }
 
-
         //backHitDto.setHits(numberOfHits);
-
     }
 
     @Transactional
@@ -68,7 +66,7 @@ public class StatsServiceImp implements StatsService {
             for (String uri : uris) {
                 List<Hit> s = statsRepository.findByUriAndTimestampsIsAfterAndTimestampsIsBefore(uri, startTime, endTime);
                 int sSize = s.size();
-                Hit h = s.get(sSize - 1);
+                Hit h = s.get(0);
                 BackHitDto newBackHitDto = BackHitDto.builder().uri(h.getUri()).app(h.getApp()).hits((long) sSize).build();
                 stats.add(newBackHitDto);
             }
@@ -85,8 +83,8 @@ public class StatsServiceImp implements StatsService {
             setStats.addAll(stats);
             List<BackHitDto> listStats = new ArrayList<>();
             listStats.addAll(setStats);
-            for (BackHitDto s : listStats) {
-                s.setHits(1L);
+            for (BackHitDto sta : listStats) {
+                sta.setHits(1L);
             }
             return listStats;
         }

@@ -57,7 +57,7 @@ public class CustomEventRepository {
         return result;
     }
 
-    public List<Event> findEvent(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size) {
+    public List<Event> findEvents(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> criteriaQuery = builder.createQuery(Event.class);
         Root<Event> root = criteriaQuery.from(Event.class);

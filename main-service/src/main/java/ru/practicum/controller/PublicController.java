@@ -55,7 +55,8 @@ public class PublicController {
                                                                @RequestParam(name = "onlyAvailable") Optional<Boolean> onlyAvailable,
                                                                @RequestParam(name = "sort") Optional<Sort> sort,
                                                                @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
-                                                               @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
+                                                               @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size,
+                                                               HttpServletRequest request) throws Exception {
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         EventDynamicQueryDto eventDynamicQueryDto;
@@ -72,7 +73,7 @@ public class PublicController {
             eventDynamicQueryDto = EventDynamicQueryDto.builder().text(text).sort(sort)
                     .onlyAvailable(onlyAvailable).categories(categories).paid(paid).build();
         }
-        return new ResponseEntity<>(eventService.getEvent(eventDynamicQueryDto, from, size), HttpStatus.OK);
+        return new ResponseEntity<>(eventService.getEvents(eventDynamicQueryDto, from, size, request), HttpStatus.OK);
     }
 
     @GetMapping("/events/{id}")

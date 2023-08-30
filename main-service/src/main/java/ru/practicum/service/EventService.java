@@ -10,7 +10,7 @@ import java.util.List;
 public interface EventService {
     FullEventDto updateEvent(EventDto eventDto, Long eventId);
 
-    List<FullEventDto> getEvent(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size);
+    List<FullEventDto> getEvents(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size, HttpServletRequest request) throws Exception;
 
     List<FullEventDto> getEventByAdmin(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size);
 

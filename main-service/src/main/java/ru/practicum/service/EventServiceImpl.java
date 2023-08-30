@@ -25,7 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +38,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final StatsClient statsClient;
-    DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Transactional ///
     @Override
@@ -172,11 +173,6 @@ public class EventServiceImpl implements EventService {
 
     }
 
-    @Transactional
-    @Override
-    public List<FullEventDto> getEvent(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size) {
-        return customEventRepository.findEvent(eventDynamicQueryDto, from, size).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
-    }
 
     @Transactional
     @Override
@@ -192,11 +188,6 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toFullEventDto(event);
     }
 
-    @Transactional
-    public List<FullEventDto> getUserEvents(Long userId, Long from, Long size) {
-        PageRequest page = PageRequest.of(from.intValue() > 0 ? from.intValue() / size.intValue() : 0, size.intValue());
-        return eventRepository.findByInitiator(userId, page).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
-    }
 
     @Transactional
     public FullEventDto getEventById(Long id, HttpServletRequest request) throws Exception {
@@ -208,17 +199,95 @@ public class EventServiceImpl implements EventService {
         //BackHitDto back = objectMapper.readValue(hit.getBody().toString(), BackHitDto.class);
         String start = LocalDateTime.now().minusYears(10L).format(formatter);
         String end = LocalDateTime.now().plusYears(10L).format(formatter);
+
         List<String> uri = new ArrayList<>();
         uri.add(request.getRequestURI());
 
+        String body = statsClient.getStats(start, end, uri, true).getBody().toString();
 
-        String[] backHitDtoSplitString = statsClient.getStats(start, end, uri, true).getBody().toString().split("=");
-        String rowViews = backHitDtoSplitString[3];
-        String[] poorViews = rowViews.split("}");
-        Long countOfViews = Long.valueOf(poorViews[0]);
-        event.setViews(countOfViews);
+        List<Long> eventViewsMap = new ArrayList<>(parseClientBackObjectToViews(body).values());
+        Long eventViews = eventViewsMap.get(0);
+        event.setViews(eventViews);
 
         return EventMapper.toFullEventDto(event);
+    }
+
+    @Transactional
+    public List<FullEventDto> getUserEvents(Long userId, Long from, Long size) {
+        PageRequest page = PageRequest.of(from.intValue() > 0 ? from.intValue() / size.intValue() : 0, size.intValue());
+        return eventRepository.findByInitiator(userId, page).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public List<FullEventDto> getEvents(EventDynamicQueryDto eventDynamicQueryDto, Long from, Long size, HttpServletRequest request) throws Exception {
+        ResponseEntity<Object> hit = statsClient.saveHit(HitDto.builder().app("ewm-main-service").uri(request.getRequestURI())
+                .ip(request.getRemoteAddr()).timestamp(LocalDateTime.now().format(formatter)).build());
+        List<Event> events = new ArrayList<>(customEventRepository.findEvents(eventDynamicQueryDto, from, size));
+
+        /*LocalDateTime start = LocalDateTime.now().plusHours(1);
+        LocalDateTime end = LocalDateTime.now();
+
+        for (Event event : events) {
+            if (event.getEventDate().isBefore(end)) {
+                start = event.getEventDate();
+            }
+        }
+
+        for (Event event : events) {
+            if (event.getEventDate().isAfter(end)) {
+                end = event.getEventDate();
+            }
+        }*/
+        String start = LocalDateTime.now().minusYears(10L).format(formatter);
+        String end = LocalDateTime.now().plusYears(10L).format(formatter);
+        List<String> uri = new ArrayList<>();
+        uri.add(request.getRequestURI());
+
+        String body = statsClient.getStats(start, end, uri, true).getBody().toString();
+        Map<Long, Long> countViews = parseClientBackObjectToViews(body);
+
+        List<FullEventDto> fullEventDtos = events.stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
+
+        for (FullEventDto event : fullEventDtos) {
+            if (countViews.containsKey(event.getId())) {
+                event.setViews(countViews.get(event.getId()));
+            }
+        }
+        return fullEventDtos;
+
+        // return customEventRepository.findEvents(eventDynamicQueryDto, from, size).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
+    }
+
+    private Map<Long, Long> parseClientBackObjectToViews(String clientBackString) {
+        String withoutBrackets = clientBackString.subSequence(1, clientBackString.length() - 1).toString();
+        String[] splitRightBracket = withoutBrackets.split("}");
+        Map<Long, Long> eventViews = new HashMap<>();
+        if (splitRightBracket.length > 1) {
+            for (String part : splitRightBracket) {
+                eventViews.putAll(parseSubPartClientBackObjectToViews(part));
+            }
+        } else {
+            eventViews.putAll(parseSubPartClientBackObjectToViews(splitRightBracket[0]));
+        }
+
+        return eventViews;
+    }
+
+    private Map<Long, Long> parseSubPartClientBackObjectToViews(String splitRightBracket) {
+        Map<Long, Long> eventViews = new HashMap<>();
+        String[] backHitDtoSplitString = splitRightBracket.split("\\,\\ hits\\=");
+        Long countOfViews = Long.valueOf(backHitDtoSplitString[1]);
+        String[] backHitDtoSplitStringLeftPart = backHitDtoSplitString[0].split("uri\\=");
+        String[] backHitDtoSplitStringLeftPartRight = backHitDtoSplitStringLeftPart[1].split("/");
+        try {
+            Long event = Long.valueOf(backHitDtoSplitStringLeftPartRight[2]);
+            eventViews.put(event, countOfViews);
+            return eventViews;
+        } catch (Exception e) {
+            return eventViews;
+        }
+
     }
 
     @Transactional
