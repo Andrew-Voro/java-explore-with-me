@@ -64,11 +64,14 @@ public class CustomEventRepository {
 
         List<Predicate> predicates = new ArrayList<>();
 
+        //            predicates.add(criteriaBuilder.like((event.get("annotation")), "%" + publicParametersDto.getText() + "%"));
+
         if (eventDynamicQueryDto.getText().isPresent()) {
-            String searchText = "%" + eventDynamicQueryDto.getText().get().toLowerCase() + "%";
+            predicates.add(builder.like((root.get("annotation")), "%" + eventDynamicQueryDto.getText().get() + "%"));
+            /*String searchText = "%" + eventDynamicQueryDto.getText().get().toLowerCase() + "%";
             Predicate searchAnnotation = builder.like(root.get("annotation"), searchText);
             Predicate searchDescription = builder.like(root.get("description"), searchText);
-            predicates.add(builder.or(searchAnnotation, searchDescription));
+            predicates.add(builder.or(searchAnnotation, searchDescription));*/
         }
         if (eventDynamicQueryDto.getCategories().isPresent()) {
             Predicate categories = root.get("category").in(eventDynamicQueryDto.getCategories().get());

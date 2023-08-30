@@ -20,6 +20,7 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    @Column(name = "annotation", nullable = false)
     String annotation;
     @ManyToOne
     @JoinColumn(name = "category")
@@ -28,6 +29,7 @@ public class Event {
     Long confirmedRequests;
     @Column(name = "created_on")
     LocalDateTime createdOn;
+    @Column(name = "description", nullable = false)
     String description;
     @Column(name = "event_date")
     LocalDateTime eventDate;
