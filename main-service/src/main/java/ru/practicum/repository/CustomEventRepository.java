@@ -3,7 +3,6 @@ package ru.practicum.repository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.dto.query.EventDynamicQueryDto;
-import ru.practicum.enums.Sort;
 import ru.practicum.enums.State;
 import ru.practicum.model.Event;
 
