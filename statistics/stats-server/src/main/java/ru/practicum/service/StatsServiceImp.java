@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.BackHitDto;
 import ru.practicum.dto.HitDto;
+import ru.practicum.handler.exception.ValidationException;
 import ru.practicum.mapper.HitMapper;
 import ru.practicum.model.Hit;
 import ru.practicum.repository.StatsRepository;
@@ -57,6 +58,10 @@ public class StatsServiceImp implements StatsService {
         } catch (Exception e) {
             startTime = LocalDateTime.parse(start);
             endTime = LocalDateTime.parse(end);
+        }
+
+        if (endTime.isBefore(startTime)) {
+            throw new ValidationException("rangeEnd не может быть раньше rangeStart");
         }
         List<BackHitDto> stats = new ArrayList<>();
         if (uris != null && uris.get(0).equals("null")) {
