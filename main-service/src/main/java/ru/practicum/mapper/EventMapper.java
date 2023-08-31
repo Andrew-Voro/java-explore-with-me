@@ -49,10 +49,10 @@ public class EventMapper {
                 event.getEventDate(),
                 event.getInitiator(),
                 Location.builder().lat(event.getLat()).lon(event.getLon()).build(),
-                event.getPaid(),
+                event.getPaid() != null ? event.getPaid() : false,
                 event.getParticipantLimit(),
                 event.getPublishedOn(),
-                event.getRequestModeration(),
+                event.getRequestModeration() != null ? event.getRequestModeration() : false,
                 event.getStateAction(),
                 event.getTitle(),
                 event.getViews()
