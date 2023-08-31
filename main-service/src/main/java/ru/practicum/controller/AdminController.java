@@ -178,6 +178,7 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @SuppressWarnings(value = "DLS_DEAD_LOCAL_STORE")
     @PostMapping("/compilations")
     public ResponseEntity<Compilation> saveNewCompilation(@RequestBody @Valid CompilationDto compilation) {
         if (compilation.getTitle().length() > 50) {
