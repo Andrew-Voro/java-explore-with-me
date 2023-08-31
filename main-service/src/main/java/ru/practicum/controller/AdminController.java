@@ -2,7 +2,6 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.util.Lists;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,6 @@ import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Compilation;
-import ru.practicum.model.Event;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.service.CategoryService;
 import ru.practicum.service.CompilationService;
@@ -25,7 +23,6 @@ import ru.practicum.service.UserService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -178,8 +175,8 @@ public class AdminController {
     public ResponseEntity<Compilation> saveNewCompilation(@RequestBody @Valid CompilationDto compilation) {
         if (compilation.getTitle().length() > 50) {
             log.info("Title сборки  должно содержать меньше или равно 50 символов ");
-            List<Event> events = new ArrayList<>();
-            Lists.newArrayList(compilation.getEvents());
+            //List<Event> events = new ArrayList<>();
+            //Lists.newArrayList(compilation.getEvents());
             //return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? Sets.newHashSet(eventRepository
             //        .findAllById(Lists.newArrayList(compilation.getEvents()))) : null), HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ?
