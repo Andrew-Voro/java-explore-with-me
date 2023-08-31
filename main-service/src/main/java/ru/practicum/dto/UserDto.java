@@ -1,6 +1,5 @@
 package ru.practicum.dto;
 
-import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
