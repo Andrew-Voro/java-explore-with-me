@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "compilations", schema = "public", uniqueConstraints = {@UniqueConstraint(columnNames = {"title"})})
@@ -32,7 +32,7 @@ public class Compilation {
                     referencedColumnName = "id"))
     //@JsonBackReference
             //@ManyToMany(mappedBy = "compilations")
-            //List<Event> events;
-            Set<Event> events;
+            List<Event> events;
+    //Set<Event> events;
     Boolean pinned;
 }

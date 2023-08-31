@@ -101,19 +101,22 @@ public class PrivateController {
     @PostMapping("/{userId}/requests")
     public ResponseEntity<RequestDto> saveRequest(@Min(0) @PathVariable("userId") Long userId,
                                                   @Min(0) @RequestParam(name = "eventId") Long eventId) {
-        RequestDto requestDto = RequestDto.builder().created(LocalDateTime.now()).event(eventId).requester(userId).status(State.PENDING).build(); //State.CONFIRMED
+
+        RequestDto requestDto = RequestDto.builder().created(LocalDateTime.now()).event(eventId).requester(userId).status(State.PENDING).build();
+        log.info("Пользователь с  id: " + userId + " сделал запрос.");
         return new ResponseEntity<>(requestService.saveRequest(userId, eventId, requestDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/{userId}/requests")
     public ResponseEntity<List<RequestDto>> getUserRequest(@Min(0) @PathVariable("userId") Long userId) {
+        log.info("Пользователь с  id: " + userId + " запрос сделанных им запросов.");
         return new ResponseEntity<>(requestService.getUserRequests(userId), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
     public ResponseEntity<List<RequestDto>> getUserEventRequest(@Min(0) @PathVariable("userId") Long userId,
                                                                 @Min(0) @PathVariable("eventId") Long eventId) {
-
+        log.info("Запрос пользователь с  id: " + userId + "событие с id: " + eventId);
         return new ResponseEntity<>(requestService.getUserEventRequest(userId, eventId), HttpStatus.OK);
     }
 
@@ -122,7 +125,7 @@ public class PrivateController {
                                                         @Min(0) @PathVariable("eventId") Long eventId, @RequestBody EventDto eventDto) { //@Valid
 
         if (eventDto.getDescription() != null && (eventDto.getDescription().length() < 20 || eventDto.getDescription().length() > 7000)) {
-            log.info("Description события  должно содержать больше или равно 20 символов или меньше либо равно 7000");
+            log.info("Description события id: {} должно содержать больше или равно 20 символов или меньше либо равно 7000", eventId);
             //EventMapper.toDtoEvent(userId, eventDto, CategoryMapper.toDtoCategory(categoryService.getCategory(eventDto.getCategory())));
             if (eventDto.getCategory() != null) {
                 return new ResponseEntity<>(EventMapper.toFullEventDto(EventMapper.toDtoEvent(userId, eventDto, CategoryMapper
@@ -131,7 +134,7 @@ public class PrivateController {
                 return new ResponseEntity<>(EventMapper.toFullEventDto(EventMapper.toDtoEvent(userId, eventDto, null)), HttpStatus.BAD_REQUEST);
         }
         if (eventDto.getAnnotation() != null && (eventDto.getAnnotation().length() < 20 || eventDto.getAnnotation().length() > 2000)) {
-            log.info("Annotation события  должно содержать больше или равно 20 символов или меньше либо равно 2000");
+            log.info("Annotation события id: {} должно содержать больше или равно 20 символов или меньше либо равно 2000", eventId);
             //EventMapper.toDtoEvent(userId, eventDto, CategoryMapper.toDtoCategory(categoryService.getCategory(eventDto.getCategory())));
             if (eventDto.getCategory() != null) {
                 return new ResponseEntity<>(EventMapper.toFullEventDto(EventMapper.toDtoEvent(userId, eventDto, CategoryMapper
@@ -141,7 +144,7 @@ public class PrivateController {
         }
 
         if (eventDto.getTitle() != null && (eventDto.getTitle().length() < 3 || eventDto.getTitle().length() > 120)) {
-            log.info("Title события  должно содержать больше или равно 3 символов или меньше либо равно 120");
+            log.info("Title события id: {} должно содержать больше или равно 3 символов или меньше либо равно 120", eventId);
             // EventMapper.toDtoEvent(userId, eventDto, CategoryMapper.toDtoCategory(categoryService.getCategory(eventDto.getCategory())));
             if (eventDto.getCategory() != null) {
                 return new ResponseEntity<>(EventMapper.toFullEventDto(EventMapper.toDtoEvent(userId, eventDto, CategoryMapper
@@ -155,6 +158,7 @@ public class PrivateController {
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ResponseEntity<RequestDto> updateRequestCancel(@Min(0) @PathVariable("userId") Long userId,
                                                           @Min(0) @PathVariable("requestId") Long requestId) {
+        log.info("Запрос  id: {} отменен пользователем  id: {}", requestId, userId);
         return new ResponseEntity<>(requestService.updateRequestCancel(userId, requestId), HttpStatus.OK);
     }
 
@@ -162,7 +166,7 @@ public class PrivateController {
     public ResponseEntity<RequestsDtoLists> updateRequestStatusByOwner(@Min(0) @PathVariable("userId") Long userId,
                                                                        @Min(0) @PathVariable("eventId") Long eventId,
                                                                        @RequestBody EventRequestConfirmQueryDto eventRequestConfirmQueryDto) {
-
+        log.info("Запрос на событие id: {} обновлен пользователем  id: {}", eventId, userId);
         return new ResponseEntity<>(requestService.updateRequestStatusByOwner(userId, eventId, eventRequestConfirmQueryDto), HttpStatus.OK);
     }
 }

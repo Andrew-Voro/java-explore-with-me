@@ -1,7 +1,6 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
-import org.assertj.core.util.Sets;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,7 @@ public class CompilationServiceImpl implements CompilationService {
             events = null;
         }
 
-        return compilationRepository.save(CompilationMapper.toDtoCompilation(compilationDto, Sets.newHashSet(events)));
+        return compilationRepository.save(CompilationMapper.toDtoCompilation(compilationDto, events));/*Sets.newHashSet(events)*/
     }
 
     @Transactional ///
@@ -78,7 +77,8 @@ public class CompilationServiceImpl implements CompilationService {
             events = null;
         }
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new ObjectNotFoundException("Compilation not found"));
-        compilation.setEvents(Sets.newHashSet(events));
+        // compilation.setEvents(Sets.newHashSet(events));
+        compilation.setEvents(events);
         compilation.setPinned(compilationDto.getPinned());
         if (compilationDto.getTitle() != null) {
             compilation.setTitle(compilationDto.getTitle());

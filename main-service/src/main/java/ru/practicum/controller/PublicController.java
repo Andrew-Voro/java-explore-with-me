@@ -40,7 +40,7 @@ public class PublicController {
 
     @GetMapping("/categories/{catId}")
     public ResponseEntity<CategoryDto> getAllCategory(@PathVariable("catId") Long catId) {
-        log.info("Категория с  catId: " + catId + " запрошена.");
+        log.info("Категория с  id: " + catId + " запрошена.");
         return new ResponseEntity<>(categoryService.getCategory(catId), HttpStatus.OK);
 
     }
@@ -72,16 +72,20 @@ public class PublicController {
             eventDynamicQueryDto = EventDynamicQueryDto.builder().text(text).sort(sort)
                     .onlyAvailable(onlyAvailable).categories(categories).paid(paid).build();
         }
+
+        log.info("События запрошены.");
         return new ResponseEntity<>(eventService.getEvents(eventDynamicQueryDto, from, size, request), HttpStatus.OK);
     }
 
     @GetMapping("/events/{id}")
     public ResponseEntity<FullEventDto> getEventById(@PathVariable(name = "id") Long id, HttpServletRequest request) throws Exception {
+        log.info("Событие с id: {} запрошено.", id);
         return new ResponseEntity<>(eventService.getEventById(id, request), HttpStatus.OK);
     }
 
     @GetMapping("/compilations/{compId}")
     public ResponseEntity<Compilation> getCompilationById(@PathVariable(name = "compId") Long compId) {
+        log.info("Сборка с id: {} запрошена.", compId);
         return new ResponseEntity<>(compilationService.getCompilationById(compId), HttpStatus.OK);
     }
 
@@ -92,6 +96,7 @@ public class PublicController {
         if (pinned.isEmpty()) {
             return new ResponseEntity<>(compilationService.getCompilations(from, size), HttpStatus.OK);
         }
+        log.info("Сборки запрошены.");
         return new ResponseEntity<>(compilationService.getCompilations(pinned.get(), from, size), HttpStatus.OK);
     }
 }
