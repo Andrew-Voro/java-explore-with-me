@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.StatsClient;
+import ru.practicum.constant.CommonConstants;
 import ru.practicum.dto.EventDto;
 import ru.practicum.dto.FullEventDto;
 import ru.practicum.dto.HitDto;
@@ -45,10 +46,6 @@ public class EventServiceImpl implements EventService {
     public FullEventDto updateEvent(EventDto eventDto, Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ObjectNotFoundException("Event not found"));
 
-        /*if (!(event.getStateAction().equals(State.PUBLISHED)||event.getStateAction().equals(State.PUBLISH_EVENT)
-        ||eventDto.getStateAction().equals(State.PUBLISHED)||eventDto.getStateAction().equals(State.PUBLISH_EVENT))) {
-            throw new ConflictException("Status not Published");
-        }*/
         if (eventDto.getPaid() != null) {
             event.setPaid(eventDto.getPaid());
         }
@@ -65,9 +62,8 @@ public class EventServiceImpl implements EventService {
             event.setDescription(eventDto.getDescription());
         }
         if (eventDto.getEventDate() != null) {
-            DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), formatter);
+
+            LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), CommonConstants.formatter);
             if (eventDate.isBefore(LocalDateTime.now())) {
                 throw new ValidationException("Нельзя менять дату события на уже наступившую");
             }
@@ -138,9 +134,7 @@ public class EventServiceImpl implements EventService {
             event.setDescription(eventDto.getDescription());
         }
         if (eventDto.getEventDate() != null) {
-            DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), formatter);
+            LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), CommonConstants.formatter);
             if (eventDate.isBefore(LocalDateTime.now())) {
                 throw new ValidationException("Нельзя менять дату события на уже наступившую");
             }
@@ -195,8 +189,7 @@ public class EventServiceImpl implements EventService {
         event.setViews(event.getViews() != null ? event.getViews() : 0L);
         ResponseEntity<Object> hit = statsClient.saveHit(HitDto.builder().app("ewm-main-service").uri(request.getRequestURI())
                 .ip(request.getRemoteAddr()).timestamp(LocalDateTime.now().format(formatter)).build());
-        //ObjectMapper objectMapper = new ObjectMapper();
-        //BackHitDto back = objectMapper.readValue(hit.getBody().toString(), BackHitDto.class);
+
         String start = LocalDateTime.now().minusYears(10L).format(formatter);
         String end = LocalDateTime.now().plusYears(10L).format(formatter);
 
@@ -256,7 +249,6 @@ public class EventServiceImpl implements EventService {
         }
         return fullEventDtos;
 
-        // return customEventRepository.findEvents(eventDynamicQueryDto, from, size).stream().map(EventMapper::toFullEventDto).collect(Collectors.toList());
     }
 
     private Map<Long, Long> parseClientBackObjectToViews(String clientBackString) {

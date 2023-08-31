@@ -2,9 +2,12 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.util.Lists;
+import org.assertj.core.util.Sets;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.constant.CommonConstants;
 import ru.practicum.dto.*;
 import ru.practicum.dto.query.EventDynamicQueryDto;
 import ru.practicum.enums.State;
@@ -13,6 +16,7 @@ import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Compilation;
+import ru.practicum.model.Event;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.service.CategoryService;
 import ru.practicum.service.CompilationService;
@@ -22,7 +26,7 @@ import ru.practicum.service.UserService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,15 +45,6 @@ public class AdminController {
 
     @PostMapping("/users")
     public ResponseEntity<UserDto> saveNewUser(@RequestBody @Valid UserDto user) { ///
-
-        if (user.getEmail() == null) {
-            throw new ValidationException("Not found email in body of request ");
-        }
-
-        if (user.getEmail().isBlank() || !(user.getEmail().contains("@"))) {
-            log.info("Некорректный почтовый адрес");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
 
         if (user.getName() == null) {
             throw new ValidationException("Not found property name in body of request ");
@@ -103,12 +98,8 @@ public class AdminController {
             return new ResponseEntity<>(eventService.getEventByAdmin(eventDynamicQueryDto, from, size), HttpStatus.OK);
         }
 
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-
-        LocalDateTime startTime = LocalDateTime.parse(rangeStart, formatter);
-        LocalDateTime endTime = LocalDateTime.parse(rangeEnd, formatter);
+        LocalDateTime startTime = LocalDateTime.parse(rangeStart, CommonConstants.formatter);
+        LocalDateTime endTime = LocalDateTime.parse(rangeEnd, CommonConstants.formatter);
         if (endTime.isBefore(startTime)) {
             throw new ValidationException("rangeEnd не может быть раньше rangeStart");
         }
@@ -191,8 +182,11 @@ public class AdminController {
     public ResponseEntity<Compilation> saveNewCompilation(@RequestBody @Valid CompilationDto compilation) {
         if (compilation.getTitle().length() > 50) {
             log.info("Title сборки  должно содержать меньше или равно 50 символов ");
-            return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? eventRepository
-                    .findAllById(compilation.getEvents()) : null), HttpStatus.BAD_REQUEST);
+
+            List<Event> events = new ArrayList<>();
+            Lists.newArrayList(compilation.getEvents());
+            return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? Sets.newHashSet(eventRepository
+                    .findAllById(Lists.newArrayList(compilation.getEvents()))) : null), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(compilationService.saveCompilation(compilation), HttpStatus.CREATED);
     }
@@ -207,8 +201,9 @@ public class AdminController {
     public ResponseEntity<Compilation> patchCompilationById(@PathVariable(name = "compId") Long compId, @RequestBody CompilationDto compilation) {
         if (compilation.getTitle() != null && compilation.getTitle().length() > 50) {
             log.info("Title сборки  должно содержать меньше или равно 50 символов ");
-            return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? eventRepository
-                    .findAllById(compilation.getEvents()) : null), HttpStatus.BAD_REQUEST);
+
+            return new ResponseEntity<>(CompilationMapper.toDtoCompilation(compilation, compilation.getEvents() != null ? Sets.newHashSet(eventRepository
+                    .findAllById(Lists.newArrayList(compilation.getEvents()))) : null), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(compilationService.patchCompilationById(compId, compilation), HttpStatus.OK);
     }

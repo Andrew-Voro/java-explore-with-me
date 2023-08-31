@@ -1,7 +1,7 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.util.Sets;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +16,7 @@ import ru.practicum.repository.EventRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
@@ -37,7 +37,7 @@ public class CompilationServiceImpl implements CompilationService {
             events = null;
         }
 
-        return compilationRepository.save(CompilationMapper.toDtoCompilation(compilationDto, events));
+        return compilationRepository.save(CompilationMapper.toDtoCompilation(compilationDto, Sets.newHashSet(events)));
     }
 
     @Transactional ///
@@ -78,7 +78,7 @@ public class CompilationServiceImpl implements CompilationService {
             events = null;
         }
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new ObjectNotFoundException("Compilation not found"));
-        compilation.setEvents(events);
+        compilation.setEvents(Sets.newHashSet(events));
         compilation.setPinned(compilationDto.getPinned());
         if (compilationDto.getTitle() != null) {
             compilation.setTitle(compilationDto.getTitle());

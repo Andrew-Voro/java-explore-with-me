@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.constant.CommonConstants;
 import ru.practicum.dto.EventDto;
 import ru.practicum.dto.FullEventDto;
 import ru.practicum.dto.RequestDto;
@@ -21,7 +22,6 @@ import ru.practicum.service.RequestService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -32,8 +32,6 @@ public class PrivateController {
     private final EventService eventService;
     private final RequestService requestService;
     private final CategoryService categoryService;
-    private final DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @PostMapping("/{userId}/events")
     public ResponseEntity<FullEventDto> saveNewEvent(@Min(0) @PathVariable("userId") Long userId, @RequestBody @Valid EventDto eventDto) {
@@ -71,10 +69,8 @@ public class PrivateController {
                     .toDtoCategory(categoryService.getCategory(eventDto.getCategory())))), HttpStatus.BAD_REQUEST);
         }
 
-        // DateTimeFormatter formatter =
-        //         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), formatter);
+        LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), CommonConstants.formatter);
         if (eventDate.isBefore(LocalDateTime.now())) {
             throw new ValidationException("Нельзя менять дату события на уже наступившую");
         }
@@ -83,7 +79,7 @@ public class PrivateController {
     }
 
     @GetMapping("/{userId}/events")
-    public ResponseEntity<List<FullEventDto>> getUserEvents(@PathVariable(name = "userId") Long userId,  ///
+    public ResponseEntity<List<FullEventDto>> getUserEvents(@PathVariable(name = "userId") Long userId,
                                                             @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
                                                             @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
         log.info("События пользователя с  id: " + userId + " запрошены.");
@@ -102,7 +98,6 @@ public class PrivateController {
         return new ResponseEntity<>(eventService.getUserEventById(userId, eventId), HttpStatus.OK);
     }
 
-    ///users/:userId/requests?eventId=0
     @PostMapping("/{userId}/requests")
     public ResponseEntity<RequestDto> saveRequest(@Min(0) @PathVariable("userId") Long userId,
                                                   @Min(0) @RequestParam(name = "eventId") Long eventId) {

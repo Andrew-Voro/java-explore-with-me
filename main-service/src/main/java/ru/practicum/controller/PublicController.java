@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.constant.CommonConstants;
 import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.FullEventDto;
 import ru.practicum.dto.query.EventDynamicQueryDto;
@@ -18,7 +19,6 @@ import ru.practicum.service.EventService;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,12 +57,11 @@ public class PublicController {
                                                                @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
                                                                @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size,
                                                                HttpServletRequest request) throws Exception {
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         EventDynamicQueryDto eventDynamicQueryDto;
         if (rangeStart != null && rangeEnd != null) {
-            LocalDateTime startTime = LocalDateTime.parse(rangeStart, formatter);
-            LocalDateTime endTime = LocalDateTime.parse(rangeEnd, formatter);
+            LocalDateTime startTime = LocalDateTime.parse(rangeStart, CommonConstants.formatter);
+            LocalDateTime endTime = LocalDateTime.parse(rangeEnd, CommonConstants.formatter);
             if (endTime.isBefore(startTime)) {
                 throw new ValidationException("rangeEnd не может быть раньше rangeStart");
             }

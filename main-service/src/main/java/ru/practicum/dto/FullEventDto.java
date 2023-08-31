@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.constant.CommonConstants;
 import ru.practicum.enums.State;
 import ru.practicum.model.Category;
 
@@ -19,21 +20,21 @@ public class FullEventDto {
     String annotation;//
     Category category;//
     Long confirmedRequests;//
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = CommonConstants.formatterToString)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.formatterToString)
     LocalDateTime createdOn;//
     String description;//
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = CommonConstants.formatterToString)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.formatterToString)
     LocalDateTime eventDate;//
     Long initiator;//
     Location location;//
-    Boolean paid;//
+    boolean paid;//
     Long participantLimit;//
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = CommonConstants.formatterToString)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.formatterToString)
     LocalDateTime publishedOn;//
-    Boolean requestModeration;//
+    boolean requestModeration;//
     State state;//
     String title;//
     Long views;//

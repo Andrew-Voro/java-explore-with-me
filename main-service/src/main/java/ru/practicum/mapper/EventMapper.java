@@ -2,6 +2,7 @@ package ru.practicum.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.practicum.constant.CommonConstants;
 import ru.practicum.dto.EventDto;
 import ru.practicum.dto.FullEventDto;
 import ru.practicum.dto.Location;
@@ -57,27 +58,11 @@ public class EventMapper {
                 event.getViews()
         );
     }
-       /* Long id;
-        String annotation;
-        Long category;
-        Long confirmedRequests;
-        LocalDateTime createdOn;
-        String description;
-        LocalDateTime eventDate;
-        Long initiator;
-        Location location;
-        Boolean paid;
-        Long participantLimit;
-        LocalDateTime publishedOn;
-        Boolean requestModeration;
-        String stateAction;
-        String title;
-        Long views;*/
 
 
     public static Event toDtoEvent(Long userId, EventDto eventDto, Category category) {
         DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                DateTimeFormatter.ofPattern(CommonConstants.formatterToString);
         return new Event(
                 eventDto.getId() != null ? eventDto.getId() : null,
                 eventDto.getAnnotation() != null ? eventDto.getAnnotation() : null,

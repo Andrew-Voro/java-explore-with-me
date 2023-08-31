@@ -32,14 +32,10 @@ public class RequestMapper {
     }
 
     public static Request toDtoRequest(RequestDto requestDto, User user, Event event) {
-       /* DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");*/
         return new Request(
                 requestDto.getId(),
-                //LocalDateTime.parse(requestDto.getCreated().toString(), formatter),
                 requestDto.getCreated(),
                 event,
-                //requestDto.getEvent(),
                 user,
                 requestDto.getStatus()
         );

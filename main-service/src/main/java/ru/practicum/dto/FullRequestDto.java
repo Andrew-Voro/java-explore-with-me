@@ -16,7 +16,6 @@ public class FullRequestDto {
     Long id;
     LocalDateTime created;
     Event event;
-    //Long event;
     UserShortDto requester;
     State status;
 }

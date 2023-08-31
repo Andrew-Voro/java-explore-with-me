@@ -6,11 +6,11 @@ import ru.practicum.dto.CompilationDto;
 import ru.practicum.model.Compilation;
 import ru.practicum.model.Event;
 
-import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CompilationMapper {
-    public static Compilation toDtoCompilation(CompilationDto compilationDto, List<Event> events) {
+    public static Compilation toDtoCompilation(CompilationDto compilationDto, Set<Event> events) {
         return new Compilation(
                 compilationDto.getId(),
                 compilationDto.getTitle(),

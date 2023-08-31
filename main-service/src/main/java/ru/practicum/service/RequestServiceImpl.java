@@ -39,9 +39,7 @@ public class RequestServiceImpl implements RequestService {
         if (!event.getStateAction().equals(State.PUBLISHED)) {
             throw new ConflictException("Запрос на участие в неопубликованном событии не возможен.");
         }
-        /*if (requestRepository.findByEventAndStatus(event, State.CONFIRMED).size() >= event.getParticipantLimit()) {
-            throw new ConflictException("Запрос на участие в  событии не возможен,превышен лимит участников.");
-        }*/
+
 
         if (requestRepository.findByEventAndRequester(event, user).isEmpty()) {
 
@@ -72,7 +70,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestDto> getUserRequests(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("User not found"));
-        //return requestRepository.findByRequester(user).stream().map(RequestMapper::toFullRequestDto).collect(Collectors.toList());
         return requestRepository.findByRequester(user).stream().map(RequestMapper::toRequestDto).collect(Collectors.toList());
     }
 
@@ -88,13 +85,6 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     @Override
     public RequestDto updateRequestCancel(Long userId, Long requestId) {
-        /*Request request = requestRepository.findById(requestId).orElseThrow(() -> new ObjectNotFoundException("Request not found"));
-        if(request.getEvent().getInitiator()==userId) {
-            request.setStatus(State.CANCELED);
-            return RequestMapper.toFullRequestDto(requestRepository.save(request));
-        }
-
-        return RequestMapper.toFullRequestDto(request);*/
         User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("User not found"));
         Request request = requestRepository.findByIdAndRequester(requestId, user);
         request.setStatus(State.CANCELED);
@@ -113,39 +103,6 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Лимит заявок на участие превышен");
         }
         List<Request> requests = requestRepository.findByEventAndIdIn(event, eventRequestConfirmQueryDto.getRequestIds());
-       /* List<Request> requests = requestRepository.findByIdIn(eventRequestConfirmQueryDto.getRequestIds());
-        List<RequestDto> requestsDtos =  requests.stream().map(RequestMapper::toRequestDto).collect(Collectors.toList());
-
-        List<RequestDto> confirmedRequests = new ArrayList<>();
-        List<RequestDto> rejectedRequests = new ArrayList<>();
-
-        if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
-            throw new ConflictException("Лимит заявок на участие превышен");
-        }
-        if (!event.getConfirmedRequests().equals(event.getParticipantLimit())
-                && (eventRequestConfirmQueryDto.getStatus().equals(State.CONFIRMED))) {
-            confirmedRequests = requestsDtos
-                    .stream()
-                    .filter(o -> o.getStatus().equals(State.PENDING))
-                    .collect(Collectors.toList());
-            confirmedRequests.forEach(o -> o.setStatus(State.CONFIRMED));
-            requestRepository.saveAll(confirmedRequests.stream().map(x->RequestMapper
-                    .toDtoRequest(x,userRepository.findById(x.getRequester()).orElse(null),eventRepository
-                            .findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
-            event.setConfirmedRequests(event.getConfirmedRequests() + confirmedRequests.size());
-            eventRepository.save(event);
-        }
-        if (event.getConfirmedRequests().equals(event.getParticipantLimit())
-                || eventRequestConfirmQueryDto.getStatus().equals(State.REJECTED)) {
-            rejectedRequests = requestsDtos
-                    .stream()
-                    .filter(o -> o.getStatus().equals(State.PENDING))
-                    .collect(Collectors.toList());
-            rejectedRequests.forEach(o -> o.setStatus(State.REJECTED));
-            requestRepository.saveAll(rejectedRequests.stream().map(x->RequestMapper.toDtoRequest(x,userRepository
-                    .findById(x.getRequester()).orElse(null),eventRepository
-                    .findById(x.getEvent()).orElse(null))).collect(Collectors.toList()));
-        }*/
         Long participantLimit = event.getParticipantLimit();
         Long confirmedRequests = event.getConfirmedRequests();
         Boolean unConfirmed = false;

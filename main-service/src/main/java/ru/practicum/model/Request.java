@@ -20,9 +20,7 @@ public class Request {
     Long id;
     LocalDateTime created;
     @ManyToOne
-    // @JoinColumn(name = "event")
-            Event event;
-    // Long event;
+    Event event;
     @ManyToOne
     @JoinColumn(name = "requester")
     User requester;

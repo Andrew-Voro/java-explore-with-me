@@ -105,24 +105,5 @@ public class CustomEventRepository {
                 .getResultList();
         return result;
     }
-        /*if (eventDynamicQueryDto.getSort().isPresent()) {
-            if (eventDynamicQueryDto.getSort().get().equals(Sort.EVENT_DATE)) {
-                criteriaQuery.select(root)
-                        .where(builder.or(predicates.toArray(new Predicate[predicates.size()]))).orderBy(builder.desc(root.get("eventDate")));
-                TypedQuery<Event> query = entityManager.createQuery(criteriaQuery);
-                query.setFirstResult(0);
-                query.setMaxResults(10);
-                List<Event> result = query.getResultList();
-                return result;
-            }
-        } else {
-            criteriaQuery.select(root)
-                    .where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
-        }
-        TypedQuery<Event> query = entityManager.createQuery(criteriaQuery);
-        query.setFirstResult(0);
-        query.setMaxResults(10);
-        List<Event> result = query.getResultList();
-        return result;
-    }*/
+
 }
