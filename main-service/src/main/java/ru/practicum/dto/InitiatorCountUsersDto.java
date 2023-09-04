@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 
 public class InitiatorCountUsersDto {
-    String Initiator;
+    String initiator;
     Long countOfSubscribers;
 }

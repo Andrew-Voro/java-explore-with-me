@@ -24,7 +24,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -226,9 +225,9 @@ public class PrivateController {
 
     @GetMapping("/subscription/initiator/count")
     public ResponseEntity<List<InitiatorCountUsersDto>> getInitiatorOrderedByNumberOfUsers(@Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
-                                                                               @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
+                                                                                           @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
         log.info("Запрос на поиск инициаторов упорядоченных по количеству пользователей");
         return new ResponseEntity<>(subscriptionService.getInitiatorOrderedByNumberOfUsers(from, size), HttpStatus.OK);
     }
 
-    }
+}

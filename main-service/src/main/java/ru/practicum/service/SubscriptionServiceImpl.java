@@ -16,9 +16,7 @@ import ru.practicum.repository.SubscriptionRepository;
 import ru.practicum.repository.UserRepository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,19 +73,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public List<Event> getEventsOfSubscriptionsByUserId(Long userId, Long from, Long size) {
         userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("User not found"));
         PageRequest page = PageRequest.of(from.intValue() > 0 ? from.intValue() / size.intValue() : 0, size.intValue());
-        return  subscriptionRepository.getEventsOfSubscriptionsByUserId(userId, State.PUBLISHED,page);
+        return subscriptionRepository.getEventsOfSubscriptionsByUserId(userId, State.PUBLISHED, page);
     }
+
     @Transactional
     @Override
     public List<InitiatorCountUsersDto> getInitiatorOrderedByNumberOfUsers(Long from, Long size) {
-        List<InitiatorCountUsersDto> results= new ArrayList<>();
+        List<InitiatorCountUsersDto> results = new ArrayList<>();
         PageRequest page = PageRequest.of(from.intValue() > 0 ? from.intValue() / size.intValue() : 0, size.intValue());
         List<Object[]> resultList = subscriptionRepository.getInitiatorOfThemNumberOfUsers(page);
         for (Object[] resultType : resultList) {
-            InitiatorCountUsersDto initiatorCountUsersDto = InitiatorCountUsersDto.builder().Initiator((String) resultType[0]).countOfSubscribers((Long) resultType[1]).build();
+            InitiatorCountUsersDto initiatorCountUsersDto = InitiatorCountUsersDto.builder().initiator((String) resultType[0]).countOfSubscribers((Long) resultType[1]).build();
             results.add(initiatorCountUsersDto);
         }
-        List<InitiatorCountUsersDto> sorted = results.stream().sorted((x,y)->(y.getCountOfSubscribers().compareTo(x.getCountOfSubscribers()))).collect(Collectors.toList());
+        List<InitiatorCountUsersDto> sorted = results.stream().sorted((x, y) -> (y.getCountOfSubscribers().compareTo(x.getCountOfSubscribers()))).collect(Collectors.toList());
         return sorted;
     }
 }
