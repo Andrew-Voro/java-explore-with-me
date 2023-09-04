@@ -6,7 +6,6 @@ import ru.practicum.model.Event;
 import ru.practicum.model.User;
 
 import java.util.List;
-import java.util.Map;
 
 public interface SubscriptionService {
     SubscriptionDto saveSubscription(SubscriptionDto subscriptionDto);
