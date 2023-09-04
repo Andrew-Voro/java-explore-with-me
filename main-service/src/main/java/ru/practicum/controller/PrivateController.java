@@ -6,23 +6,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.constant.CommonConstants;
-import ru.practicum.dto.EventDto;
-import ru.practicum.dto.FullEventDto;
-import ru.practicum.dto.RequestDto;
-import ru.practicum.dto.RequestsDtoLists;
+import ru.practicum.dto.*;
 import ru.practicum.dto.query.EventRequestConfirmQueryDto;
 import ru.practicum.enums.State;
+import ru.practicum.handler.exception.ConflictException;
 import ru.practicum.handler.exception.ValidationException;
 import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.mapper.EventMapper;
+import ru.practicum.model.Event;
+import ru.practicum.model.User;
 import ru.practicum.service.CategoryService;
 import ru.practicum.service.EventService;
 import ru.practicum.service.RequestService;
+import ru.practicum.service.SubscriptionService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -32,6 +34,7 @@ public class PrivateController {
     private final EventService eventService;
     private final RequestService requestService;
     private final CategoryService categoryService;
+    private final SubscriptionService subscriptionService;
 
     @PostMapping("/{userId}/events")
     public ResponseEntity<FullEventDto> saveNewEvent(@Min(0) @PathVariable("userId") Long userId, @RequestBody @Valid EventDto eventDto) {
@@ -169,4 +172,63 @@ public class PrivateController {
         log.info("Запрос на событие id: {} обновлен пользователем  id: {}", eventId, userId);
         return new ResponseEntity<>(requestService.updateRequestStatusByOwner(userId, eventId, eventRequestConfirmQueryDto), HttpStatus.OK);
     }
-}
+
+    @PostMapping("/{userId}/subscription")
+    public ResponseEntity<SubscriptionDto> saveSubscription(@Min(0) @PathVariable("userId") Long userId,
+                                                            @Min(0) @RequestParam(name = "initiatorId") Long initiatorId) {
+        if (userId.equals(initiatorId)) {
+            throw new ConflictException("Пользоватеьль не может быть подписанным на себя.");
+        }
+
+        SubscriptionDto subscriptionDto = SubscriptionDto.builder().user(userId).initiator(initiatorId).build();
+        log.info("Пользователь с  id: " + userId + " сделал запрос  на подписку на пользователя " + initiatorId);
+        return new ResponseEntity<>(subscriptionService.saveSubscription(subscriptionDto), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{userId}/subscription")
+    public ResponseEntity<SubscriptionDto> getSubscriptionByUserIdAndInitiatorId(@Min(1) @PathVariable("userId") Long userId,
+                                                                                 @Min(1) @RequestParam(name = "initiatorId") Long initiatorId) {
+        log.info("Запрос на поиск подписки пользователя с  id: " + userId + " пользователя с  id: " + initiatorId);
+        return new ResponseEntity<>(subscriptionService.getSubscriptionByUserIdAndInitiatorId(userId, initiatorId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{userId}/subscription")
+    public ResponseEntity<Void> deleteSubscriptionByUserIdAndInitiatorId(@Min(1) @PathVariable("userId") Long userId,
+                                                                         @Min(1) @RequestParam(name = "initiatorId") Long initiatorId) {
+        log.info("Запрос на удаление подписки пользователя с  id: " + userId + " пользователя с  id: " + initiatorId);
+        subscriptionService.deleteSubscriptionByUserIdAndInitiatorId(userId, initiatorId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/subscription/initiator/{initiatorId}")
+    public ResponseEntity<List<User>> getSubscribedUsersByInitiatorId(@Min(1) @PathVariable("initiatorId") Long initiatorId,
+                                                                      @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
+                                                                      @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
+        log.info("Запрос на поиск подписчиков пользователя с  id: " + initiatorId);
+        return new ResponseEntity<>(subscriptionService.getUsersOfInitiator(initiatorId, from, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/subscription/{userId}")
+    public ResponseEntity<List<User>> getInitiatorsByUserId(@Min(1) @PathVariable("userId") Long userId,
+                                                            @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
+                                                            @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
+        log.info("Запрос на поиск подписчиков пользователя с  id: " + userId);
+        return new ResponseEntity<>(subscriptionService.getInitiatorsOfUser(userId, from, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/subscription/events/{userId}")
+    public ResponseEntity<List<Event>> getEventsOfSubscriptionsByUserId(@Min(1) @PathVariable("userId") Long userId,
+                                                                        @Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
+                                                                        @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
+        log.info("Запрос на поиск подписчиков пользователя с  id: " + userId);
+        return new ResponseEntity<>(subscriptionService.getEventsOfSubscriptionsByUserId(userId, from, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/subscription/initiator/count")
+    public ResponseEntity<List<InitiatorCountUsersDto>> getInitiatorOrderedByNumberOfUsers(@Min(0) @RequestParam(name = "from", required = false, defaultValue = "0") Long from,
+                                                                               @Min(0) @RequestParam(name = "size", required = false, defaultValue = "10") Long size) {
+        log.info("Запрос на поиск инициаторов упорядоченных по количеству пользователей");
+        return new ResponseEntity<>(subscriptionService.getInitiatorOrderedByNumberOfUsers(from, size), HttpStatus.OK);
+    }
+
+    }
